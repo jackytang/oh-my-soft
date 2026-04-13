@@ -1,0 +1,26 @@
+{
+    "version": "3.5.3",
+    "description": "Lightweight open-source alternative to Logitech Options+ for remapping Logitech HID++ mice.",
+    "homepage": "https://github.com/TomBadash/Mouser",
+    "license": "MIT",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/TomBadash/Mouser/releases/download/v3.5.3/Mouser-Windows.zip",
+            "hash": "8d228ed823cdc92257ff22234aed07e011683d4e7489b31249725f641d505662"
+        }
+    },
+    "bin": "Mouser\\Mouser.exe",
+    "shortcuts": [
+        ["Mouser\\Mouser.exe", "Mouser"]
+    ],
+    "checkver": {
+        "github": "https://github.com/TomBadash/Mouser"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/TomBadash/Mouser/releases/download/v$version/Mouser-Windows.zip"
+            }
+        }
+    }
+}
