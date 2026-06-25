@@ -1,0 +1,77 @@
+{
+    "version": "1.1.4",
+    "description": "A git client based on the IntelliJ platform (open-source remake of the short-lived JetBrains git client).",
+    "homepage": "https://github.com/DetachHead/rebased",
+    "license": "Apache-2.0",
+    "notes": [
+        "Rebased was installed silently via its bundled IntelliJ/NSIS installer into the Scoop app directory.",
+        "Launch it from the Start Menu shortcut, or run 'rebased' in a new shell.",
+        "Project-level .idea generation can be disabled in Settings > Appearance & Behavior > System Settings."
+    ],
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/DetachHead/rebased/releases/download/1.1.4/rebased.exe",
+            "hash": "280361b1b12dc00519f1b23263aea89225b56355e2b6a16a3f0e8898f213777e"
+        }
+    },
+    "pre_install": [
+        "# IntelliJ-based installers read shortcut/PATH/association choices from a silent config file.",
+        "$silentConfig = \"$dir\\silent.config\"",
+        "@(",
+        "    'mode=user',",
+        "    'launcher64=1',",
+        "    'updatePATH=0',",
+        "    'updateContextMenu=0',",
+        "    ''",
+        ") | Set-Content -LiteralPath $silentConfig -Encoding ASCII"
+    ],
+    "installer": {
+        "script": [
+            "$installDir = \"$dir\\app\"",
+            "$setup = \"$dir\\rebased.exe\"",
+            "$config = \"$dir\\silent.config\"",
+            "Write-Host 'Installing Rebased silently (this can take a minute)...'",
+            "# /S silent, /NCRC skips the verify popup, /CONFIG before /D, /D (install dir) MUST be last and unquoted.",
+            "$args = \"/S /NCRC /CONFIG=$config /D=$installDir\"",
+            "$proc = Start-Process -FilePath $setup -ArgumentList $args -PassThru -Wait",
+            "if ($proc.ExitCode -ne 0) { error \"Rebased installer failed with exit code $($proc.ExitCode).\"; exit 1 }",
+            "# NSIS template hardcodes a vendor Start Menu folder; scoop's own shortcut supersedes it.",
+            "$nsisStartMenu = \"$env:APPDATA\\Microsoft\\Windows\\Start Menu\\Programs\\detachhead\"",
+            "if (Test-Path -LiteralPath $nsisStartMenu) { Remove-Item -LiteralPath $nsisStartMenu -Recurse -Force -ErrorAction SilentlyContinue }",
+            "Remove-Item $setup, $config -Force -ErrorAction SilentlyContinue"
+        ]
+    },
+    "uninstaller": {
+        "script": [
+            "$uninst = Get-ChildItem -LiteralPath \"$dir\\app\" -Filter 'Uninstall*.exe' -ErrorAction SilentlyContinue | Select-Object -First 1",
+            "if ($uninst) {",
+            "    $proc = Start-Process -FilePath $uninst.FullName -ArgumentList '/S' -PassThru -Wait",
+            "    if ($proc.ExitCode -ne 0) { warn \"Uninstaller returned exit code $($proc.ExitCode).\" }",
+            "} else {",
+            "    warn 'No Rebased uninstaller was found; the app folder will be removed by Scoop.'",
+            "}"
+        ]
+    },
+    "bin": [
+        [
+            "app\\bin\\idea64.exe",
+            "rebased"
+        ]
+    ],
+    "shortcuts": [
+        [
+            "app\\bin\\idea64.exe",
+            "Rebased"
+        ]
+    ],
+    "checkver": {
+        "github": "https://github.com/DetachHead/rebased"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/DetachHead/rebased/releases/download/$version/rebased.exe"
+            }
+        }
+    }
+}
